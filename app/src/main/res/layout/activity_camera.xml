@@ -7,20 +7,5 @@
     android:orientation="vertical"
     tools:context=".Camera">
 
-    <ImageView
-        android:id="@+id/imageview"
-        android:layout_width="match_parent"
-        android:layout_height="400dp"
-        android:layout_marginTop="16dp"
-        android:src="@drawable/ic_baseline_camera_24"
-        />
-
-    <Button
-        android:id="@+id/btncamera"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="Open Camera" />
-
 
 </LinearLayout>
