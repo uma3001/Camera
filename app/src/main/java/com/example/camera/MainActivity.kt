@@ -2,6 +2,7 @@ package com.example.camera
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
@@ -18,6 +19,7 @@ private lateinit var imageview: ImageView
 class MainActivity : AppCompatActivity() {
     private lateinit var filePhoto:File
     private  val FILE_NAME = "photo.jpg"
+    private val IMAGE_CHOOSE = 1000;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,9 +35,10 @@ class MainActivity : AppCompatActivity() {
                 cam()
             }
             builder.setNegativeButton("Open Gallery") { dialogInterface, which ->
-                val intent = Intent(this, Gallery::class.java)
-                startActivity(intent)
+                //val intent = Intent(this, Gallery::class.java)
+                //startActivity(intent)
                 Toast.makeText(this, "Opening Gallery", Toast.LENGTH_SHORT).show()
+                gallery()
             }
             builder.setNeutralButton("Close") { dialogInterface, which ->
                 Toast.makeText(this, "Cancel", Toast.LENGTH_SHORT).show()
@@ -46,10 +49,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if(requestCode== REQUEST_CODE && resultCode == Activity.RESULT_OK&& data!= null){
-            imageview.setImageBitmap(data?.extras?.get("data") as Bitmap)
+        if(requestCode== REQUEST_CODE && resultCode == Activity.RESULT_OK){
+            val photo = BitmapFactory.decodeFile(filePhoto.absolutePath)
+            imageview.setImageBitmap(photo)
         }else{
             super.onActivityResult(requestCode, resultCode, data)
+        }
+        if(requestCode == REQUEST_CODE&& resultCode== Activity.RESULT_OK) {
+               imageview.setImageURI(data?.data)
         }
     }
     private fun cam() {
@@ -63,5 +70,10 @@ class MainActivity : AppCompatActivity() {
     private fun getPhotoFile(fileName: String): File {
         val directoryStorage = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File.createTempFile(fileName, ".jpg", directoryStorage)
+    }
+    private fun gallery(){
+        val i = Intent(Intent.ACTION_PICK)
+             i.type = "image/*"
+              startActivityForResult(i,IMAGE_CHOOSE)
     }
 }
