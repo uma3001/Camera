@@ -1,7 +1,7 @@
 package com.example.camera
+
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -19,7 +19,7 @@ private lateinit var imageview: ImageView
 class MainActivity : AppCompatActivity() {
     private lateinit var filePhoto:File
     private  val FILE_NAME = "photo.jpg"
-    private val IMAGE_CHOOSE = 1000;
+    private val IMAGE_CHOOSE = 1000
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
