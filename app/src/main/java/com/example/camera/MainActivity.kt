@@ -19,6 +19,7 @@ import java.io.File
 
 
 private const val REQUEST_CODE = 100
+private const val CODE = 200
 private lateinit var imageview: ImageView
 class MainActivity : AppCompatActivity() {
     private lateinit var filePhoto:File
@@ -29,11 +30,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val btnchoose = findViewById<Button>(R.id.btnchoose)
-        var permission = arrayOf(
-            android.Manifest.permission.CAMERA,
-            android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            android.Manifest.permission.READ_EXTERNAL_STORAGE
-        )
 
         btnchoose.setOnClickListener {
             val builder = AlertDialog.Builder(this@MainActivity)
@@ -41,7 +37,7 @@ class MainActivity : AppCompatActivity() {
             builder.setMessage(R.string.dialogMessage)
             builder.setPositiveButton("Open Camera") { dialogInterface, which ->
                 requestpermission()
-                //Toast.makeText(this, "Opening Camera", Toast.LENGTH_SHORT).show()
+               // Toast.makeText(this, "Opening Camera", Toast.LENGTH_SHORT).show()
                 //cam()
             }
             builder.setNegativeButton("Open Gallery") { dialogInterface, which ->
@@ -111,7 +107,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
         if (remained) {
-            requestPermissions(permissions, 0)
+            requestPermissions(permissions, CODE)
             Toast.makeText(this, "Opening Camera", Toast.LENGTH_SHORT).show()
             cam()
         }
