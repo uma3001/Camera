@@ -1,11 +1,10 @@
 package com.example.camera
 
 import android.app.Activity
+import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
@@ -14,17 +13,19 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import java.io.File
 
 
 private const val REQUEST_CODE = 100
 private const val CODE = 200
-private lateinit var imageview: ImageView
 class MainActivity : AppCompatActivity() {
-    private lateinit var filePhoto:File
-    private  val FILE_NAME = "photo.jpg"
+    private lateinit var filePhoto: File
+    private val FILE_NAME = "photo.jpg"
     private val IMAGE_CHOOSE = 1000
+    lateinit var imageview: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,8 +37,8 @@ class MainActivity : AppCompatActivity() {
             builder.setTitle(R.string.dialogTitle)
             builder.setMessage(R.string.dialogMessage)
             builder.setPositiveButton("Open Camera") { dialogInterface, which ->
-                requestpermission()
-               // Toast.makeText(this, "Opening Camera", Toast.LENGTH_SHORT).show()
+                checkPermission(Manifest.permission.CAMERA, CODE )
+                // Toast.makeText(this, "Opening Camera", Toast.LENGTH_SHORT).show()
                 //cam()
             }
             builder.setNegativeButton("Open Gallery") { dialogInterface, which ->
@@ -54,18 +55,6 @@ class MainActivity : AppCompatActivity() {
             alertDialog.show()
         }
     }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if(requestCode== REQUEST_CODE && resultCode == Activity.RESULT_OK){
-            val photo = BitmapFactory.decodeFile(filePhoto.absolutePath)
-            imageview.setImageBitmap(photo)
-        }else{
-            super.onActivityResult(requestCode, resultCode, data)
-        }
-        if(requestCode == REQUEST_CODE&& resultCode== Activity.RESULT_OK) {
-               imageview.setImageURI(data?.data)
-        }
-    }
     private fun cam() {
         val Camintent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         filePhoto = getPhotoFile(FILE_NAME)
@@ -80,36 +69,38 @@ class MainActivity : AppCompatActivity() {
     }
     private fun gallery(){
         val i = Intent(Intent.ACTION_PICK)
-             i.type = "image/*"
-              startActivityForResult(i,IMAGE_CHOOSE)
+        i.type = "image/*"
+        startActivityForResult(i,IMAGE_CHOOSE)
     }
-    fun requestpermission() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return
-        }
-        var info: PackageInfo? = null
-        try {
-            info = packageManager.getPackageInfo(
-                applicationContext.packageName,
-                PackageManager.GET_PERMISSIONS
-            )
-        } catch (e: PackageManager.NameNotFoundException) {
-            e.printStackTrace()
-        }
-        if (info == null) {
-            return
-        }
-        val permissions = info.requestedPermissions
-        var remained = false
-        for (permission in permissions) {
-            if (checkSelfPermission(permission!!) != PackageManager.PERMISSION_GRANTED) {
-                remained = true
+        private fun checkPermission(permission: String, requestCode: Int) {
+            if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_DENIED) {
+                ActivityCompat.requestPermissions(this, arrayOf(permission), requestCode)
+            } else {
+                Toast.makeText(this, "Permission already granted", Toast.LENGTH_SHORT).show()
             }
         }
-        if (remained) {
-            requestPermissions(permissions, CODE)
-            Toast.makeText(this, "Opening Camera", Toast.LENGTH_SHORT).show()
-            cam()
+
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String?>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == CODE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "camera permission granted", Toast.LENGTH_LONG).show()
+               cam()
+            } else {
+                Toast.makeText(this, "camera permission denied", Toast.LENGTH_LONG).show()
+            }
         }
     }
-}
+       override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            val photo = BitmapFactory.decodeFile(filePhoto.absolutePath)
+                       imageview.setImageBitmap(photo)
+                    }else{
+                        super.onActivityResult(requestCode, resultCode, data)
+                    }
+                    if(requestCode == REQUEST_CODE&& resultCode== Activity.RESULT_OK) {
+                           imageview.setImageURI(data?.data)
+                    }
+        }
+    }
